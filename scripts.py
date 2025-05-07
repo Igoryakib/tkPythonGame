@@ -7,7 +7,8 @@ pygame.mixer.init()
 
 bg_music = "sounds/MainTheme.wav"
 hit_sound = pygame.mixer.Sound("sounds/Hit.wav")
-victory_sound = pygame.mixer.Sound("sounds/PateregaLose.wav")
+victory1_sound = pygame.mixer.Sound("sounds/victory1.mp3")
+victory2_sound = pygame.mixer.Sound("sounds/victory2.mp3")
 defeat_sound = pygame.mixer.Sound("sounds/OurDeath.wav")
 
 root = tk.Tk()
@@ -91,10 +92,11 @@ def is_collision(id1, id2):
 def kill_character(character_id, hp_text_id, name):
     canvas.delete(character_id)
     canvas.delete(hp_text_id)
-    canvas.create_text(700, 300, text=f"{name} програв!", fill="red", font=("Consolas", 32, "bold"))
+    canvas.create_text(700, 300, text=f"{name} Програв! Так тримати ставлю 4, але можете краще", fill="red", font=("Consolas", 32, "bold"))
     pygame.mixer.music.stop()
     if name == "Патерега":
-        victory_sound.play()
+        victory1_sound.play()
+        victory2_sound.play()
     else:
         defeat_sound.play()
     root.after(3000, show_menu)
@@ -312,7 +314,7 @@ def update_positions():
 
         
     if ihor_id is None or wadzik_id is None:
-        canvas.create_text(700, 350, text="Патерега переміг!", fill="green", font=("Consolas", 28, "bold"))
+        canvas.create_text(700, 350, text="Патерега переміг: Не приймаю таке хлопці!", fill="green", font=("Consolas", 28, "bold"))
         
         root.after(3000, show_menu)
         return
