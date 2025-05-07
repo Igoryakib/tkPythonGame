@@ -92,12 +92,13 @@ def is_collision(id1, id2):
 def kill_character(character_id, hp_text_id, name):
     canvas.delete(character_id)
     canvas.delete(hp_text_id)
-    canvas.create_text(700, 300, text=f"{name} Програв! Так тримати ставлю 4, але можете краще", fill="red", font=("Consolas", 32, "bold"))
     pygame.mixer.music.stop()
     if name == "Патерега":
+        canvas.create_text(700, 300, text=f"{name} Програв! Так тримати ставлю 4, але можете краще", fill="red", font=("Consolas", 32, "bold"))
         victory1_sound.play()
         victory2_sound.play()
     else:
+        canvas.create_text(700, 300, text=f"{name} Програв!", fill="red", font=("Consolas", 32, "bold"))
         defeat_sound.play()
     root.after(3000, show_menu)
 
