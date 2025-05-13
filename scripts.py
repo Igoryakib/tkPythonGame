@@ -16,27 +16,27 @@ root.title("Здача лабки Game")
 root.geometry("1410x600+0+0")
 
 pressed_keys = set()
-paterega_direction = -1
+teacher_direction = -1
 
 # global variables
-last_hit_time_ihor = 0
-last_hit_time_wadzik = 0
+last_hit_time_player1 = 0
+last_hit_time_player2 = 0
 damage_cooldown = 1000
-last_paterega_attack = 0
+last_teacher_attack = 0
 canvas = None
-ihor_id = None
-wadzik_id = None
-paterega_id = None
-ihor_hp = 4
-wadzik_hp = 4
-paterega_hp = 15
-ihor_hp_text = None
-wadzik_hp_text = None
-paterega_hp_text = None
-ihor_texture = None
-wadzik_texture = None
-paterega_texture = None
-Ihor_attack = [
+player1_id = None
+player2_id = None
+teacher_id = None
+player1_hp = 4
+player2_hp = 4
+teacher_hp = 15
+player1_hp_text = None
+player2_hp_text = None
+teacher_hp_text = None
+player1_texture = None
+player2_texture = None
+teacher_texture = None
+player1_attack = [
 "Ми написали нейронку з допомогою нейронки.",
 "Наша прога - інтроверт, вона нормальна, просто Вас соромиться.",
 "Ми підключили AI",
@@ -45,7 +45,7 @@ Ihor_attack = [
 "Цей раз з нами був Git"
 ]
 
-Wadzik_attack = [
+player2_attack = [
 "Я скинув Кані Весту, він оцінив.",
 "Наша прога знає ваше місцезнаходження.",
 "Я попрошу Кані Веста автограф для Вас.",
@@ -53,7 +53,7 @@ Wadzik_attack = [
 "Наша нейронка знає багато геометричних і ультраправих фігур",
 ]
 
-Paterega_attack = [
+teacher_attack = [
 "Вадим, Ви фанат Кані Веста.",
 "Хлопці, ви вайб-кодери.",
 "Інтерфейс не user-friendly.",
@@ -63,14 +63,14 @@ Paterega_attack = [
 "Я дав ГПТ на оцінку ваш код а він сказав шо це він його написав",
 ]
 attack_flags = {
-    "ihor": False,
-    "wadzik": False,
-    "paterega": False
+    "player1": False,
+    "player2": False,
+    "teacher": False
 }
 last_attack_time = {
-    "ihor": 0,
-    "wadzik": 0,
-    "paterega": 0
+    "player1": 0,
+    "player2": 0,
+    "teacher": 0
 }
 
 def is_collision(id1, id2):
@@ -120,10 +120,10 @@ def attack(attack_script, character_id, target_ids, color, flag_key, direction=1
 
 def show_menu():
     
-    global canvas, ihor_hp, wadzik_hp, paterega_hp
-    ihor_hp = 4
-    wadzik_hp = 4
-    paterega_hp = 15
+    global canvas, player1_hp, player2_hp, teacher_hp
+    player1_hp = 4
+    player2_hp = 4
+    teacher_hp = 15
     for widget in root.winfo_children():
         widget.destroy()
 
@@ -147,26 +147,26 @@ def set_attack_inactive(flag_key):
     attack_flags[flag_key] = False
 
 def handle_damage(target_id):
-    global ihor_hp, wadzik_hp, paterega_hp, ihor_id, wadzik_id, paterega_id
+    global player1_hp, player2_hp, teacher_hp, player1_id, player2_id, teacher_id
     hit_sound.play()
-    if target_id == ihor_id:
-        ihor_hp -= 1
-        canvas.itemconfig(ihor_hp_text, text=f"🖤: {ihor_hp}")
-        if ihor_hp <= 0:
-            kill_character(ihor_id, ihor_hp_text, "Ігор")
-            ihor_id = None
-    elif target_id == wadzik_id:
-        wadzik_hp -= 1
-        canvas.itemconfig(wadzik_hp_text, text=f"🖤: {wadzik_hp}")
-        if wadzik_hp <= 0:
-            kill_character(wadzik_id, wadzik_hp_text, "Вадим")
-            wadzik_id = None
-    elif target_id == paterega_id:
-        paterega_hp -= 1
-        canvas.itemconfig(paterega_hp_text, text=f"🖤: {paterega_hp}")
-        if paterega_hp <= 0:
-            kill_character(paterega_id, paterega_hp_text, "Патерега")
-            paterega_id = None
+    if target_id == player1_id:
+        player1_hp -= 1
+        canvas.itemconfig(player1_hp_text, text=f"🖤: {player1_hp}")
+        if player1_hp <= 0:
+            kill_character(player1_id, player1_hp_text, "Ігор")
+            player1_id = None
+    elif target_id == player2_id:
+        player2_hp -= 1
+        canvas.itemconfig(player2_hp_text, text=f"🖤: {player2_hp}")
+        if player2_hp <= 0:
+            kill_character(player2_id, player2_hp_text, "Вадим")
+            player2_id = None
+    elif target_id == teacher_id:
+        teacher_hp -= 1
+        canvas.itemconfig(teacher_hp_text, text=f"🖤: {teacher_hp}")
+        if teacher_hp <= 0:
+            kill_character(teacher_id, teacher_hp_text, "Патерега")
+            teacher_id = None
 
 
 def animate_attack(text_id, target_ids, color, direction):
@@ -221,100 +221,100 @@ def start_game():
     update_positions() 
 
 def create_characters():
-    global ihor_id, wadzik_id, paterega_id
-    global ihor_texture, wadzik_texture, paterega_texture
-    global ihor_hp_text, wadzik_hp_text, paterega_hp_text
+    global player1_id, player2_id, teacher_id
+    global player1_texture, player2_texture, teacher_texture
+    global player1_hp_text, player2_hp_text, teacher_hp_text
 
-    ihor_img = Image.open("img/IgorPlayer.png").resize((170, 200), Image.Resampling.LANCZOS)
-    ihor_texture = ImageTk.PhotoImage(ihor_img)
-    ihor_id = canvas.create_image(50, 300, anchor="nw", image=ihor_texture)
+    player1_img = Image.open("img/Player1.png").resize((170, 200), Image.Resampling.LANCZOS)
+    player1_texture = ImageTk.PhotoImage(player1_img)
+    player1_id = canvas.create_image(50, 300, anchor="nw", image=player1_texture)
 
-    wadzik_img = Image.open("img/WadikPlayer.png").resize((300, 200), Image.Resampling.LANCZOS)
-    wadzik_texture = ImageTk.PhotoImage(wadzik_img)
-    wadzik_id = canvas.create_image(50, 100, anchor="nw", image=wadzik_texture)
+    player2_img = Image.open("img/Player2.png").resize((300, 200), Image.Resampling.LANCZOS)
+    player2_texture = ImageTk.PhotoImage(player2_img)
+    player2_id = canvas.create_image(50, 100, anchor="nw", image=player2_texture)
 
-    paterega_img = Image.open("img/Paterega.png").resize((500, 300), Image.Resampling.LANCZOS)
-    paterega_texture = ImageTk.PhotoImage(paterega_img)
-    paterega_id = canvas.create_image(910, 290, anchor="nw", image=paterega_texture)
+    teacher_img = Image.open("img/Teacher.png").resize((500, 300), Image.Resampling.LANCZOS)
+    teacher_texture = ImageTk.PhotoImage(teacher_img)
+    teacher_id = canvas.create_image(910, 290, anchor="nw", image=teacher_texture)
 
-    ihor_hp_text = canvas.create_text(110, 280, text=f"🖤: {ihor_hp}", fill="red", font=("Consolas", 16, "bold"))
-    wadzik_hp_text = canvas.create_text(200, 80, text=f"🖤: {wadzik_hp}", fill="blue", font=("Consolas", 16, "bold"))
-    paterega_hp_text = canvas.create_text(1160 - 10, 270, text=f"🖤: {paterega_hp}", fill="green", font=("Consolas", 16, "bold"))
+    player1_hp_text = canvas.create_text(110, 280, text=f"🖤: {player1_hp}", fill="red", font=("Consolas", 16, "bold"))
+    player2_hp_text = canvas.create_text(200, 80, text=f"🖤: {player2_hp}", fill="blue", font=("Consolas", 16, "bold"))
+    teacher_hp_text = canvas.create_text(1160 - 10, 270, text=f"🖤: {teacher_hp}", fill="green", font=("Consolas", 16, "bold"))
 
 def update_positions():
-    global paterega_direction, ihor_hp, wadzik_hp, last_hit_time_ihor, last_hit_time_wadzik, ihor_id, wadzik_id
+    global teacher_direction, player1_hp, player2_hp, last_hit_time_player1, last_hit_time_player2, player1_id, player2_id
     now = time.time() * 1000
     if not canvas: return  
 
     keys = pressed_keys.copy()
-# wadzik move
-    if ihor_id and wadzik_id:
+# player2 move
+    if player1_id and player2_id:
         if 'Left' in keys:
-            canvas.move(wadzik_id, -10, 0)
-            canvas.move(wadzik_hp_text, -10, 0)
+            canvas.move(player2_id, -10, 0)
+            canvas.move(player2_hp_text, -10, 0)
         if 'Right' in keys:
-            canvas.move(wadzik_id, 10, 0)
-            canvas.move(wadzik_hp_text, 10, 0)
+            canvas.move(player2_id, 10, 0)
+            canvas.move(player2_hp_text, 10, 0)
         if 'Up' in keys:
-            canvas.move(wadzik_id, 0, -10)
-            canvas.move(wadzik_hp_text, 0, -10)
+            canvas.move(player2_id, 0, -10)
+            canvas.move(player2_hp_text, 0, -10)
         if 'Down' in keys:
-            canvas.move(wadzik_id, 0, 10)
-            canvas.move(wadzik_hp_text, 0, 10)
+            canvas.move(player2_id, 0, 10)
+            canvas.move(player2_hp_text, 0, 10)
         if 'Control_R' in keys:
-            attack(Wadzik_attack, wadzik_id, [paterega_id], "blue", "wadzik")
-# ihor move
+            attack(player2_attack, player2_id, [teacher_id], "blue", "player2")
+# player1 move
         if 'a' in keys: 
             print("sf")
-            canvas.move(ihor_id, -10, 0)
-            canvas.move(ihor_hp_text, -10, 0)
+            canvas.move(player1_id, -10, 0)
+            canvas.move(player1_hp_text, -10, 0)
         if 'd' in keys:
-            canvas.move(ihor_id, 10, 0)
-            canvas.move(ihor_hp_text, 10, 0)
+            canvas.move(player1_id, 10, 0)
+            canvas.move(player1_hp_text, 10, 0)
         if 'w' in keys:
-            canvas.move(ihor_id, 0, -10)
-            canvas.move(ihor_hp_text, 0, -10)
+            canvas.move(player1_id, 0, -10)
+            canvas.move(player1_hp_text, 0, -10)
         if 's' in keys:
-            canvas.move(ihor_id, 0, 10)
-            canvas.move(ihor_hp_text, 0, 10)
+            canvas.move(player1_id, 0, 10)
+            canvas.move(player1_hp_text, 0, 10)
         if 'q' in keys:
-            attack(Ihor_attack, ihor_id, [paterega_id], "red", "ihor")
-    # Paterega move
-    if paterega_id:
+            attack(player1_attack, player1_id, [teacher_id], "red", "player1")
+    # teacher move
+    if teacher_id:
         canvas_width = canvas.winfo_width()
-        paterega_width = 500
+        teacher_width = 500
         min_x = canvas_width - 650 - 100 
         max_x = canvas_width - 100
 
-        x, _ = canvas.coords(paterega_id)
+        x, _ = canvas.coords(teacher_id)
         if x <= min_x:
-            paterega_direction = 1
+            teacher_direction = 1
         elif x >= max_x:
-            paterega_direction = -1
-        canvas.move(paterega_id, paterega_direction * 3, 0)
-        canvas.move(paterega_hp_text, paterega_direction * 3, 0)
-        global last_paterega_attack
+            teacher_direction = -1
+        canvas.move(teacher_id, teacher_direction * 3, 0)
+        canvas.move(teacher_hp_text, teacher_direction * 3, 0)
+        global last_teacher_attack
         current_time = time.time()
-        if current_time - last_paterega_attack > 4.5:
-            attack(Paterega_attack, paterega_id, [ihor_id, wadzik_id], "green", "paterega", -1)
-            last_paterega_attack = current_time
+        if current_time - last_teacher_attack > 4.5:
+            attack(teacher_attack, teacher_id, [player1_id, player2_id], "green", "teacher", -1)
+            last_teacher_attack = current_time
 
 
-    if is_collision(ihor_id, paterega_id) and now - last_hit_time_ihor > damage_cooldown:
-        ihor_hp -= 1
-        last_hit_time_ihor = now
-        handle_damage(ihor_id)
+    if is_collision(player1_id, teacher_id) and now - last_hit_time_player1 > damage_cooldown:
+        player1_hp -= 1
+        last_hit_time_player1 = now
+        handle_damage(player1_id)
         hit_sound.play()
 
 
-    if is_collision(wadzik_id, paterega_id) and now - last_hit_time_wadzik > damage_cooldown:
-        wadzik_hp -= 1
-        last_hit_time_wadzik = now
-        handle_damage(wadzik_id)
+    if is_collision(player2_id, teacher_id) and now - last_hit_time_player2 > damage_cooldown:
+        player2_hp -= 1
+        last_hit_time_player2 = now
+        handle_damage(player2_id)
         hit_sound.play()
 
         
-    if ihor_id is None or wadzik_id is None:
+    if player1_id is None or player2_id is None:
         canvas.create_text(700, 350, text="Патерега переміг: Не приймаю таке хлопці!", fill="green", font=("Consolas", 28, "bold"))
         
         root.after(3000, show_menu)
